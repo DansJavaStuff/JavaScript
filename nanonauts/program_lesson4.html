@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nanonaut Action</title>
+</head>
+<body>
+<script>
+// Define the variable for the canvas
+var canvas = document.createElement('canvas');
+// Set the canvas width & height in pixels
+canvas.width = 800;
+canvas.height = 600;
+// Apply those changes to the canvas
+document.body.appendChild(canvas);
+
+// define the context to allow us to write to the canvas
+var c = canvas.getContext('2d');
+
+// Define some more variables
+// Create the image object
+var image = new Image();
+// Point the image object to the image file we want to use
+image.src = 'nanonaut.png'
+
+var x = 0;
+var y = 40;
+
+// Event listener to wait until the load event has completed before calling the 'start' function
+window.addEventListener('load', start);
+
+// 'start' function, draws the image
+function start1() {
+c.fillStyle = 'green';
+c.fillRect(10, 10, 30, 30);
+c.drawImage(image, 50, 70);
+}
+
+function start() {
+window.requestAnimationFrame(loop);
+}
+
+function loop() {
+// Drawing code will go here
+// This bit clears the canvas to that it looks like the image is moving, rather than smearing
+c.clearRect(0, 0, 800, 600)
+
+// his will draw the image from the file, then re-draw it at the next co-ordinates
+c.drawImage(image, x, y);
+x = x + 1;
+
+window.requestAnimationFrame(loop);
+}
+
+// Apply changes to the canvas
+document.body.appendChild(canvas);
+</script>
+</body>
+</html>

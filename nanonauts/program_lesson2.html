@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nanonaut Action</title>
+</head>
+<body>
+<script>
+// Define the variable for the canvas
+var canvas = document.createElement('canvas');
+// Set the canvas width & height in pixels
+canvas.width = 800;
+canvas.height = 600;
+
+//Apply those changes to the canvas
+document.body.appendChild(canvas);
+
+//defint the context to allow us to write to the canvas
+var c = canvas.getContext('2d');
+
+//Apply styles to the canvas
+c.fillStyle = 'yellow';
+c.fillRect(10, 10, 300, 300);
+
+//Change the style and starting point of the pen to draw a 2nd square
+c.fillStyle = 'green';
+c.fillRect(310, 310, 300, 300);
+
+//Apply changes to the canvas
+document.body.appendChild(canvas);
+</script>
+</body>
+</html>

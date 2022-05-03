@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nanonaut Action</title>
+</head>
+<body>
+<script>
+// Define the variable for the canvas
+var canvas = document.createElement('canvas');
+// Set the canvas width & height in pixels
+canvas.width = 800;
+canvas.height = 600;
+// Apply those changes to the canvas
+document.body.appendChild(canvas);
+
+// define the context to allow us to write to the canvas
+var c = canvas.getContext('2d');
+
+// Define some more variables
+// Create the image object
+var image = new Image();
+// Point the image object to the image file we want to use
+image.src = 'nanonaut.png'
+
+// Event listener to wait until the load event has completed before calling the 'start' function
+window.addEventListener('load', start);
+
+// 'start' function, draws the image
+function start() {
+c.fillStyle = 'green';
+c.fillRect(10, 10, 30, 30);
+c.drawImage(image, 50, 70);
+}
+
+// Apply changes to the canvas
+document.body.appendChild(canvas);
+</script>
+</body>
+</html>
