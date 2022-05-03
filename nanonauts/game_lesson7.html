@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nanonaut Action</title>
+</head>
+<body>
+<script>
+// CONSTANTS
+var CANVAS_WIDTH = 800;				// Default = 800
+var CANVAS_HEIGHT = 600;			// Default = 600
+var NANONAUT_WIDTH = 181;			// Default = 181
+var NANONAUT_HEIGHT = 229;			// Default = 229
+var NANONAUT_X_SPEED = 5;			// Default = 5
+var GROUND_Y = 540;					// Default = 540
+var NANONAUT_Y_ACCELERATION = 1;	// Default = 1
+var NANONAUT_JUMP_SPEED = 20;		// Default = 20
+var SPACE_KEYCODE = 32;				// Space bar kay code = 32
+var BACKGROUND_WIDTH = 1000;		// Default = 1000
+//var NANONAUT_NR_FRAMES_PER_ROW = 5;	// Default = 5
+var NANONAUT_NR_ANIMATION_FRAMES = 7;	// Default = 7
+var NANONAUT_ANIMATION_SPEED = 3;	// Default = 3, Higher the number, the slower he goes!
+var NUMBER_OF_BUSHES = 10;			// Enter the number of bushes, more bushes = busier screen
+var ROBOT_WIDTH = 141;				// Default is 141
+var ROBOT_HEIGHT = 139;				// Default is 139
+var ROBOT_NR_ANIMATION_FRAMES = 9;	// Default = 9
+var ROBOT_ANIMATION_SPEED = 5;		// Default = 5, Higher the number, the slower he goes!
+var ROBOT_X_SPEED = 4;				// Default = 4
+
+// SETUP
+var canvas = document.createElement('canvas');
+var c = canvas.getContext('2d');
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+document.body.appendChild(canvas);
+var cameraX = 0;
+var cameraY = 0;
+
+// Load the images
+var nanonautImage = new Image();
+//nanonautImage.src = 'nanonaut.png';	// Default, static Nanonaut image
+nanonautImage.src = 'animatedNanonaut.png';		// New moving Nanonaut image! :-)
+var robotImage = new Image();
+robotImage.src = 'animatedRobot.png';
+var backgroundImage = new Image();
+backgroundImage.src = 'background.png';
+var bush1Image = new Image();
+bush1Image.src = 'bush1.png';
+var bush2Image = new Image();
+bush2Image.src = 'bush2.png';
+
+var nanonautSpriteSheet = {
+	nrFramesPerRow: 5,
+	spriteWidth: NANONAUT_WIDTH,
+	spriteHeight: NANONAUT_HEIGHT,
+	image: nanonautImage
+};
+
+var robotSpriteSheet = {
+	nrFramesPerRow: 3,
+	spriteWidth: ROBOT_WIDTH,
+	spriteHeight: ROBOT_HEIGHT,
+	image: robotImage
+};
+
+var robotData = [{
+	x: 400,
+	y: GROUND_Y - ROBOT_HEIGHT,
+	frameNr: 0
+}];
+
+
+//var nanonautX = 50;					// Original, starts the nanonaut towards the top left of the screen
+//var nanonautY = 40;					// Original, starts the nanonaut towards the top left of the screen
+var nanonautX = CANVAS_WIDTH / 2;			// Added to remove the chunk of blue sky at the start
+var nanonautY = GROUND_Y - NANONAUT_HEIGHT;	// Added to remove the chunk of blue sky at the start
+var nanonautYSpeed = 0;
+var nanonautIsInTheAir = false;
+var spaceKeyIsPressed = false;
+var nanonautFrameNr = 0;
+var gameFrameCounter = 0;
+//var bushXCoordinates = [550, 750, 1000, 1200];	// Starting X co-ordinates for the bushes, add more here if you want more bushes
+// var bushData = [{
+//	x: 550, y: 100, image: bush1Image}, {		// This enables multiple bushes, with varying co-ordinates
+//	x: 750, y: 90, image: bush2Image }];		// But is limited by the number of bushes you create
+
+var bushData = generateBushes();			// Bushes created using a function, to generate multiple bushes
+
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener('keyup', onKeyUp);
+window.addEventListener('load', start);
+
+function start() {
+	window.requestAnimationFrame(mainLoop);	
+}
+
+// Function to generate bushes
+function generateBushes () {
+	var generatedBushData = [];
+	var bushX = 0;
+	while (bushX < (2 * CANVAS_WIDTH)) {	// This bit ensures that bushes don't overlap
+		var bushImage;
+		if (Math.random() >= 0.5) {			// randomly select one of the bush images
+			bushImage = bush1Image;
+		} else {
+			bushImage = bush2Image;
+		}
+	generatedBushData.push ({
+		x: bushX,
+		y: 80 + Math.random() * 20,
+		image: bushImage
+	});
+	bushX += 150 + Math.random() * 200;
+}
+	return generatedBushData;
+}
+
+// MAIN LOOP
+function mainLoop(){
+	update();
+	draw();
+	window.requestAnimationFrame(mainLoop);
+}
+
+// PLAYER INPUT
+// What happens when keys are pressed?
+function onKeyDown(event) {
+	if (event.keyCode === SPACE_KEYCODE) {
+		spaceKeyIsPressed = true;
+	}
+}
+
+function onKeyUp(event) {
+	if (event.keyCode === SPACE_KEYCODE) {
+		spaceKeyIsPressed = false;
+	}
+}
+
+// UPDATING
+function update() {
+	gameFrameCounter = gameFrameCounter + 1;
+	nanonautX = nanonautX + NANONAUT_X_SPEED;
+	if (spaceKeyIsPressed && !nanonautIsInTheAir) {
+		nanonautYSpeed = -NANONAUT_JUMP_SPEED;
+		nanonautIsInTheAir = true;
+	}
+// Move the Nanonaut
+	nanonautY = nanonautY + nanonautYSpeed;
+	nanonautYSpeed = nanonautYSpeed + NANONAUT_Y_ACCELERATION;
+	// IF statement, so if parentheses are true, then execute what's in the braces
+	if (nanonautY > (GROUND_Y - NANONAUT_HEIGHT)) {
+		nanonautY = GROUND_Y - NANONAUT_HEIGHT;
+		nanonautYSpeed = 0;
+		nanonautIsInTheAir = false;
+	}
+
+// Update Animation
+
+if ((gameFrameCounter % NANONAUT_ANIMATION_SPEED) === 0) {
+	nanonautFrameNr = nanonautFrameNr + 1;
+if (nanonautFrameNr >= NANONAUT_NR_ANIMATION_FRAMES) {
+	nanonautFrameNr = 0;
+}
+}
+
+	// Update the camera
+	cameraX = nanonautX - 150;
+
+// Update bushes
+for (var i=0; i<bushData.length; i++) {
+	if ((bushData[i].x - cameraX) < - CANVAS_WIDTH) {
+		bushData[i].x += (2 * CANVAS_WIDTH) + 150;
+	}
+}
+
+// Update robots
+updateRobots();
+
+function updateRobots() {
+	// Move and animate robots
+	for (var i=0; i<robotData.length; i++) {
+		robotData[i].x -= ROBOT_X_SPEED;
+		if ((gameFrameCounter % ROBOT_ANIMATION_SPEED) === 0){
+			robotData[i].frameNr = robotData[i].frameNr + 1;
+			if (robotData[i].frameNr >= ROBOT_NR_ANIMATION_FRAMES) {
+				robotData[i].frameNr = 0;
+			}
+		}
+	}
+}
+
+}	// End of update function
+
+// DRAWING
+function draw() {
+	c.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+	c.fillStyle = 'LightSkyBlue';					// Draw the sky, choose the colour
+	c.fillRect(0, 0, CANVAS_WIDTH, GROUND_Y - 40);	// Draw the sky, fill the page with the colour
+// Draw the background
+//	c.drawImage(backgroundImage, 0, -210);			// Draw the sky, overlay the background image
+	var backgroundX = - (cameraX % BACKGROUND_WIDTH);
+	c.drawImage(backgroundImage, backgroundX, -210);			// make the background scroll to the right
+	c.drawImage(backgroundImage, backgroundX + BACKGROUND_WIDTH, -210);			// re-cdraw it so that it never ends
+
+// Draw the ground
+	c.fillStyle = 'ForestGreen';
+	c.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
+//	c.drawImage(bush1Image, 550, GROUND_Y - 100);		// Draw an individual bush
+//	c.drawImage(bush1Image, 750, GROUND_Y - 90);		// Draw a second individual bush
+// Draw multiple bushes
+// for (var i=0; i<bushXCoordinates.length; i++) {		// This uses an array, the next line uses an object array to enable
+for (var i=0; i<bushData.length; i++) {			// more bushes with less code
+	c.drawImage(bushData[i].image, bushData[i].x - cameraX, GROUND_Y - bushData[i].y - cameraY);
+}
+
+// Draw the Nanonaut.
+//	c.drawImage(nanonautImage, nanonautX, nanonautY);	// Use this bit to drop the nanonaut on a static screen
+//	c.drawImage(nanonautImage, nanonautX - cameraX, nanonautY - cameraY);	// Added this bit to make the nanonaut relative to the camera
+//	Now to draw the moving Nanoaut sprite
+//var nanonautSpriteSheetRow = Math.floor(nanonautFrameNr / NANONAUT_NR_FRAMES_PER_ROW);
+//var nanonautSpriteSheetColumn = nanonautFrameNr % NANONAUT_NR_FRAMES_PER_ROW;
+//var nanonautSpriteSheetX = nanonautSpriteSheetColumn * NANONAUT_WIDTH;
+//var nanonautSpriteSheetY = nanonautSpriteSheetRow * NANONAUT_HEIGHT;
+//c.drawImage(nanonautImage, nanonautSpriteSheetX, nanonautSpriteSheetY, NANONAUT_WIDTH, NANONAUT_HEIGHT, nanonautX - cameraX, nanonautY - cameraY, NANONAUT_WIDTH, NANONAUT_HEIGHT);
+
+// Draw the robots
+for (var i=0; i <robotData.length; i++) {
+	drawAnimatedSprite(robotData[i].x - cameraX,
+	robotData[i].y - cameraY, robotData[i].frameNr, robotSpriteSheet);
+}
+
+// Draw the Nanonaut
+drawAnimatedSprite(nanonautX - cameraX, nanonautY - cameraY, nanonautFrameNr, nanonautSpriteSheet);
+
+// Draw Animated Sprite
+function drawAnimatedSprite(screenX, screenY, frameNr, spriteSheet) {
+	var spriteSheetRow = Math.floor (frameNr / spriteSheet.nrFramesPerRow);
+	var spriteSheetColumn = frameNr % spriteSheet.nrFramesPerRow;
+	var spriteSheetX = spriteSheetColumn * spriteSheet.spriteWidth;
+	var spriteSheetY = spriteSheetRow * spriteSheet.spriteHeight;
+	c.drawImage (
+		spriteSheet.image,
+		spriteSheetX, spriteSheetY,
+		spriteSheet.spriteWidth, spriteSheet.spriteHeight, screenX, screenY,
+		spriteSheet.spriteWidth, spriteSheet.spriteHeight)
+};
+
+}			// End of draw function
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nanonaut Action</title>
+</head>
+<body>
+<script>
+// CONSTANTS
+var CANVAS_WIDTH = 800;				// Default = 800
+var CANVAS_HEIGHT = 600;			// Default = 600
+var NANONAUT_WIDTH = 181;			// Default = 181
+var NANONAUT_HEIGHT = 229;			// Default = 229
+var NANONAUT_X_SPEED = 5;			// Default = 5
+var GROUND_Y = 540;					// Default = 540
+var NANONAUT_Y_ACCELERATION = 1;	// Default = 1
+var NANONAUT_JUMP_SPEED = 20;		// Default = 20
+var SPACE_KEYCODE = 32;				// Space bar kay code = 32
+var BACKGROUND_WIDTH = 1000;		// Default = 1000
+
+// SETUP
+var canvas = document.createElement('canvas');
+var c = canvas.getContext('2d');
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+document.body.appendChild(canvas);
+var cameraX = 0;
+var cameraY = 0;
+
+var nanonautImage = new Image();
+nanonautImage.src = 'nanonaut.png';
+
+var backgroundImage = new Image();
+backgroundImage.src = 'background.png';
+
+//var nanonautX = 50;					// Original, starts the nanonaut towards the top left of the screen
+//var nanonautY = 40;					// Original, starts the nanonaut towards the top left of the screen
+var nanonautX = CANVAS_WIDTH / 2;			// Added to remove the chunk of blue sky at the start
+var nanonautY = GROUND_Y - NANONAUT_HEIGHT;	// Added to remove the chunk of blue sky at the start
+var nanonautYSpeed = 0;
+var nanonautIsInTheAir = false;
+var spaceKeyIsPressed = false;
+
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener('keyup', onKeyUp);
+window.addEventListener('load', start);
+
+function start() {
+	window.requestAnimationFrame(mainLoop);	
+}
+
+// MAIN LOOP
+function mainLoop(){
+	update();
+	draw();
+	window.requestAnimationFrame(mainLoop);
+}
+
+// PLAYER INPUT
+// What happens when keys are pressed?
+function onKeyDown(event) {
+	if (event.keyCode === SPACE_KEYCODE) {
+		spaceKeyIsPressed = true;
+	}
+}
+
+function onKeyUp(event) {
+	if (event.keyCode === SPACE_KEYCODE) {
+		spaceKeyIsPressed = false;
+	}
+}
+
+// UPDATING
+function update() {
+	nanonautX = nanonautX + NANONAUT_X_SPEED;
+	if (spaceKeyIsPressed && !nanonautIsInTheAir) {
+		nanonautYSpeed = -NANONAUT_JUMP_SPEED;
+		nanonautIsInTheAir = true;
+	}
+// Move the Nanonaut
+	nanonautY = nanonautY + nanonautYSpeed;
+	nanonautYSpeed = nanonautYSpeed + NANONAUT_Y_ACCELERATION;
+	// IF statement, so if parentheses are true, then execute what's in the braces
+	if (nanonautY > (GROUND_Y - NANONAUT_HEIGHT)) {
+		nanonautY = GROUND_Y - NANONAUT_HEIGHT;
+		nanonautYSpeed = 0;
+		nanonautIsInTheAir = false;
+	}
+
+	// Update the camera
+	cameraX = nanonautX - 150;
+}	// End of update function
+
+// DRAWING
+function draw() {
+	c.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+	c.fillStyle = 'LightSkyBlue';					// Draw the sky, choose the colour
+	c.fillRect(0, 0, CANVAS_WIDTH, GROUND_Y - 40);	// Draw the sky, fill the page with the colour
+// Draw the background
+//	c.drawImage(backgroundImage, 0, -210);			// Draw the sky, overlay the background image
+	var backgroundX = - (cameraX % BACKGROUND_WIDTH);
+	c.drawImage(backgroundImage, backgroundX, -210);			// make the background scroll to the right
+	c.drawImage(backgroundImage, backgroundX + BACKGROUND_WIDTH, -210);			// re-cdraw it so that it never ends
+
+// Draw the ground
+	c.fillStyle = 'ForestGreen';
+	c.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
+
+// Draw the Nanonaut.
+//	c.drawImage(nanonautImage, nanonautX, nanonautY);	// Use this bit to drop the nanonaut on a static screen
+	c.drawImage(nanonautImage, nanonautX - cameraX, nanonautY - cameraY);	// Added this bit to make the nanonaut relative to the camera
+}			// End of draw function
+
+</script>
+</body>
+</html>

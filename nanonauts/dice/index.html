@@ -1,0 +1,61 @@
+<html>
+  <!-- Page Head-->
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Dice Roller Durby V2</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="description" content="Play a fun dice game. Try your luck and get on the highscore list!">
+  </head>
+  <!-- Page Body: on load execute list_scores()-->
+  <body onload="get_scores(list_scores)">
+    <h1 align="center">JavaScript Dice Game Version 2</h1>
+    <div class="row" align="center">
+    <!-- Column 1 -->
+      <div class="col-3">
+        <h2>Your Dice</h2>
+        <!-- Player's Dice -->
+        <img src="images/d1.png" id="mydice1">
+        <img src="images/d1.png" id="mydice2"><br>
+        <h2>Enemy"s Dice</h2>
+        <!-- Enemey's Dice-->
+        <img src="images/e1.png" id="hisdice1">
+        <img src="images/e1.png" id="hisdice2">
+        <div id="enemy_score"></div><br>
+      </div>
+      <!-- Column 2 -->
+      <div class="col-3">
+        <!-- Play button -->
+        <button class="greenBut" onClick="throwdice()">Roll Dice</button>
+        <!-- Game Form (myform)-->
+        <form id="myform">
+          Your name:<br>
+          <!-- Player's name-->
+          <input name="player_name" maxlength="20" class="greenBut" type="text" id="player_name" placeholder="Type Your Name" required>
+          <!-- Player's Score -->
+          <br>Your score:<br>
+          <input name="player_score" class="greenBut" type="number" value=0 id="score" readonly></input><br></h3>
+          <!-- Submit Button -->
+          <button type="submit" class="greenBut">End Game</button>
+        </form>
+      </div>
+      <!-- Column 3 -->
+      <div class="col-3">
+        <br><br>
+        <!-- "message" image-->
+        <img src="images/good-luck.gif" id="message" alt="Good Luck!"/>
+      </div>
+      <!-- Column 4 -->
+      <div class="col-3" align="center">
+        <h2>High Scores</h2>
+        <!-- error container -->
+        <div id="error"></div>
+        <!-- High Score Lists -->
+        <ol id="highscores"></ol>
+        <!-- lowest high score hidden input -->
+        <input id="lowscore" type="hidden">
+      </div>
+    </div>
+    <script type="text/javascript" src="main.js"></script>
+  </body>
+</html>
